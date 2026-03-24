@@ -22,6 +22,7 @@ jobs:
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+        working-directory: watch2gether
         run: |
-          go run ./watch2gether
+          go run .
 
