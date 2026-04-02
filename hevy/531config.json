@@ -1,0 +1,54 @@
+{
+  "lifts": {
+    "bench_press": {
+      "training_max_kg": 75,
+      "exercise_template_id": "79D0BB3A",
+      "bbb_exercise_template_id": "d3608a39-1040-452f-931c-1132b3d4ef69"
+    },
+    "deadlift": {
+      "training_max_kg": 125,
+      "exercise_template_id": "C6272009",
+      "bbb_exercise_template_id": "0b4be9be-00aa-443c-b724-5aafa97368d2"
+    },
+    "overhead_press": {
+      "training_max_kg": 45,
+      "exercise_template_id": "7B8D84E8",
+      "bbb_exercise_template_id": "f44c9f6b-f2ee-442a-9fb5-a6137aca3e94",
+      "use_lbs": true
+    },
+    "squat": {
+      "training_max_kg": 95,
+      "exercise_template_id": "33284d33-b98e-4320-851f-501a19477f8b",
+      "bbb_exercise_template_id": "884ef46c-ad9c-4685-ae06-d15f1b5b926e"
+    }
+  },
+  "cycle_number": 1,
+  "week_number": 0,
+  "routine_ids": {
+    "bench_press": {
+      "1": "6f8ae519-4bc3-4e47-ad70-fb88c5c417bb",
+      "2": "cc8fd062-3f66-4299-82eb-1cf9f8158303",
+      "3": "ed730c58-3050-46d1-9fb1-bd01a7ce50e3",
+      "4": "1c1bdb30-6571-495f-9486-801dc4794a12"
+    },
+    "deadlift": {
+      "1": "b19b7a04-4a54-45e0-beea-930c00c05bb4",
+      "2": "ed972cd3-7b95-4c1f-8058-a0bf52b70e34",
+      "3": "cf3b273b-ec96-445b-bc93-947e9e01b23c",
+      "4": "124b80f9-c6cf-4a3b-a598-3d5d1ea024a2"
+    },
+    "overhead_press": {
+      "1": "44331187-51df-47d3-92fe-a58d787a4e8e",
+      "2": "19ffa215-9950-4d93-ad6a-0dd794b8b94a",
+      "3": "eac05580-763f-4f8e-bf50-bb62e94f5258",
+      "4": "d9dc280f-91e4-4f7f-bc43-847a25244940"
+    },
+    "squat": {
+      "1": "5f23be49-554e-4088-9d6f-bc101934733d",
+      "2": "016acf44-1536-4577-9c4c-4c3c28edf3df",
+      "3": "5cb70078-13b8-4db8-99fc-cff087e2d8dc",
+      "4": "35ec3888-212b-4a23-afc6-1abacbda5a5e"
+    }
+  },
+  "folder_id": 2631282
+}
