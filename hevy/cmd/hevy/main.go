@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"sort"
 	"strings"
+	"time"
 
 	"hevy"
 	"hevy/fivethreeone"
@@ -55,6 +57,7 @@ Commands:
   exercises search <name>    Search exercise templates by name
   exercises get <id>         Get a single exercise template
   workouts list              List recent workouts
+  workouts lastweek [-n N]   Print workouts from N weeks ago (default 1, 0 = this week)
   workouts count             Print total workout count
   workouts get <id>          Get a single workout
   routines list              List all routines
@@ -151,6 +154,8 @@ func cmdWorkouts(ctx context.Context, client *hevy.Client, args []string) {
 				w.EndTime.Format("15:04"),
 				len(w.Exercises))
 		}
+	case "lastweek":
+		cmdWorkoutsLastWeek(ctx, client, args[1:])
 	case "count":
 		count, err := client.GetWorkoutCount(ctx)
 		if err != nil {
@@ -190,6 +195,83 @@ func cmdWorkouts(ctx context.Context, client *hevy.Client, args []string) {
 	default:
 		fmt.Fprintf(os.Stderr, "unknown workouts command: %s\n", args[0])
 		os.Exit(1)
+	}
+}
+
+func cmdWorkoutsLastWeek(ctx context.Context, client *hevy.Client, args []string) {
+	fs := flag.NewFlagSet("workouts lastweek", flag.ExitOnError)
+	n := fs.Int("n", 1, "weeks back (0 = current week, 1 = last completed week)")
+	fs.Parse(args)
+
+	if *n < 0 {
+		fmt.Fprintln(os.Stderr, "-n must be >= 0")
+		os.Exit(1)
+	}
+
+	// Compute Monday 00:00 local time of the target week (ISO week, Mon start).
+	now := time.Now()
+	wd := int(now.Weekday()) // Sunday = 0 .. Saturday = 6
+	if wd == 0 {
+		wd = 7
+	}
+	daysFromMonday := wd - 1
+	thisMonday := time.Date(now.Year(), now.Month(), now.Day()-daysFromMonday, 0, 0, 0, 0, now.Location())
+	start := thisMonday.AddDate(0, 0, -7*(*n))
+	end := start.AddDate(0, 0, 7)
+
+	var collected []hevy.Workout
+	for w, err := range client.ListWorkouts(ctx) {
+		if err != nil {
+			slog.Error("listing workouts", "error", err)
+			os.Exit(1)
+		}
+		if w.StartTime.Before(start) {
+			// Hevy returns workouts newest-first; everything past this point is older than our window.
+			break
+		}
+		if w.StartTime.Before(end) {
+			collected = append(collected, w)
+		}
+	}
+
+	sort.Slice(collected, func(i, j int) bool {
+		return collected[i].StartTime.Before(collected[j].StartTime)
+	})
+
+	fmt.Printf("Week of %s — %s\n",
+		start.Format("Mon 2006-01-02"),
+		start.AddDate(0, 0, 6).Format("Mon 2006-01-02"))
+
+	if len(collected) == 0 {
+		fmt.Println("No workouts logged in this week.")
+		return
+	}
+
+	fmt.Printf("%d workout(s)\n", len(collected))
+
+	for _, w := range collected {
+		fmt.Printf("\n%s — %s\n", w.StartTime.Format("Mon 2006-01-02 15:04"), w.Title)
+		for _, e := range w.Exercises {
+			fmt.Printf("\n  %s\n", e.Title)
+			if e.Notes != "" {
+				fmt.Printf("    Notes: %s\n", e.Notes)
+			}
+			for _, s := range e.Sets {
+				weight := ""
+				if s.WeightKg != nil {
+					weight = fmt.Sprintf("%.1f kg", *s.WeightKg)
+				}
+				reps := ""
+				if s.Reps != nil {
+					reps = fmt.Sprintf("x%d", *s.Reps)
+				}
+				rpe := ""
+				if s.RPE != nil {
+					rpe = fmt.Sprintf("  @RPE %.1f", *s.RPE)
+				}
+				fmt.Printf("    [%s] %s %s%s\n", s.Type, weight, reps, rpe)
+			}
+		}
 	}
 }
 
